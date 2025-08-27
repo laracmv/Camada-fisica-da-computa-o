@@ -13,6 +13,7 @@
 from enlace import *
 import time
 import numpy as np
+import struct
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -41,10 +42,20 @@ def main():
         
         print("esperando 1 byte de sacrifício")
         rxBuffer, nRx = com1.getData(1)
+        print(rxBuffer)
         com1.rx.clearBuffer()
         time.sleep(.1)
                   
         print(f"bit de sacrificio: {rxBuffer}")
+
+        rxBuffer, nRx = com1.getData(4)
+        print(rxBuffer)
+        # com1.rx.clearBuffer()
+        time.sleep(.1)
+
+        valor = struct.unpack(">f", rxBuffer)[0]
+        print(valor)
+        print(f"fixo 6 casas: {valor:.6f}")
             
     
         # Encerra comunicação
