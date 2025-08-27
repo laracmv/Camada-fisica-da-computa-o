@@ -44,7 +44,7 @@ def main():
         com1.rx.clearBuffer()
         time.sleep(.1)
                   
-        print(rxBuffer)
+        print(f"bit de sacrificio: {rxBuffer}")
             
     
         # Encerra comunicação
