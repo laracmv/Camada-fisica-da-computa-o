@@ -13,6 +13,7 @@
 from enlace import *
 import time
 import numpy as np
+import struct
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -22,8 +23,8 @@ import numpy as np
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM3"                  # Windows(variacao de)  detectar sua porta e substituir aqui
-
+serialName = "COM7"                  # Windows(variacao de)  detectar sua porta e substituir aqui
+cmd1 = 0x00FF00FF.to_bytes(4,byteorder="big")
 
 def main():
     try:
@@ -42,8 +43,11 @@ def main():
         time.sleep(.2)
         com1.sendData(b'00')
         time.sleep(1)
-                  
-    
+        
+        num = 1037.00006        # envia inteiro em 4 bytes (big-endian)
+        com1.sendData(struct.pack(">f", num))
+        
+        print("Enviou")
     except Exception as erro:
         print("ops! :-\\")
         print(erro)
