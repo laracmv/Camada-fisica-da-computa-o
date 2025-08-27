@@ -22,7 +22,7 @@ import numpy as np
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM4"                  # Windows(variacao de)  detectar sua porta e substituir aqui
+serialName = "COM7"                  # Windows(variacao de)  detectar sua porta e substituir aqui
 
 
 def main():
