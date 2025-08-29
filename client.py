@@ -15,11 +15,13 @@ serialName = "COM3"  # Windows (verifique se esta é a porta COM correta para o 
 # Lista de números que podem ser enviados
 listanum = [
     1037.0000, -1.43567, 12.3456, 987.654, -500.0, 
-    1.23e5, 45.4500, 200.123, -19.99, 88.88,
+    1.235, 45.4500, 200.123, -19.99, 88.88,
     -1000.5, 7.0, 3.14159, 2.71828, -0.0001
 ]
 
 def main():
+    time_out = False
+    soma_correta = sum(listanum)
     
     try:
         print("Iniciou o main do CLIENTE")
@@ -58,9 +60,28 @@ def main():
         
         print("\nTodos os números foram enviados. Aguardando a soma do servidor...")
 
-        rx, nRx = com1.getData(4)
-        soma_servidor = struct.unpack(">f", rx)[0]
-        print(soma_servidor)
+
+        start_time = time.perf_counter()
+        time_out = False
+        timeout = 5  # segundos
+
+        while not time_out:
+            elapsed = time.perf_counter() - start_time
+
+            if elapsed > timeout:
+                print("Timeout: não chegou resposta em 5s")
+                time_out = True   # força sair do while
+                break
+
+            # só tenta ler se já houver 4 bytes no buffer
+            if com1.rx.getBufferLen() >= 4:
+                rx, nRx = com1.getData(4)
+                soma_servidor = struct.unpack(">f", rx)[0]
+                print(f"A soma é: {soma_servidor:.6f}")
+                break
+
+            time.sleep(0.05)  # espera pequena p/ não travar CPU
+    
 
     except Exception as erro:
         print("Ops! Ocorreu um erro no cliente:-\\")
