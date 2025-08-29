@@ -1,59 +1,74 @@
 #####################################################
 # Camada Física da Computação
-#Carareto
-#11/08/2022
-#Aplicação
+# Carareto
+# 11/08/2022
+# Aplicação - CLIENTE
 ####################################################
-
-
-#esta é a camada superior, de aplicação do seu software de comunicação serial UART.
-#para acompanhar a execução e identificar erros, construa prints ao longo do código! 
-
 
 from enlace import *
 import time
-import numpy as np
 import struct
+import random 
 
-# voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
-#   para saber a sua porta, execute no terminal :
-#   python -m serial.tools.list_ports
-# se estiver usando windows, o gerenciador de dispositivos informa a porta
+serialName = "COM3"  # Windows (verifique se esta é a porta COM correta para o cliente)
 
-#use uma das 3 opcoes para atribuir à variável a porta usada
-#serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
-#serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM7"                  # Windows(variacao de)  detectar sua porta e substituir aqui
-cmd1 = 0x00FF00FF.to_bytes(4,byteorder="big")
+# Lista de números que podem ser enviados
+listanum = [
+    1037.0000, -1.43567, 12.3456, 987.654, -500.0, 
+    1.23e5, 45.4500, 200.123, -19.99, 88.88,
+    -1000.5, 7.0, 3.14159, 2.71828, -0.0001
+]
 
 def main():
+    
     try:
-        print("Iniciou o main")
-        #declaramos um objeto do tipo enlace com o nome "com". Essa é a camada inferior à aplicação. Observe que um parametro
-        #para declarar esse objeto é o nome da porta.
+        print("Iniciou o main do CLIENTE")
+        # Cria uma instância da classe enlace
         com1 = enlace(serialName)
         
-        
-        # Ativa comunicacao. Inicia os threads e a comunicação seiral 
+        # Ativa a comunicação. Inicia os threads e a comunicação serial 
         com1.enable()
-
-        #Se chegamos até aqui, a comunicação foi aberta com sucesso. Faça um print para informar.
-        print("Abriu a comunicação")
+        print("Abriu a comunicação com o servidor")
         
+        # 1. ENVIAR O BYTE DE SACRIFÍCIO
+        print("Enviando byte de sacrifício...")
         time.sleep(.2)
-        com1.sendData(b'00')
+        com1.sendData(b'\x00')
         time.sleep(1)
-        
-        num = 1037.00006        # envia inteiro em 4 bytes (big-endian)
-        com1.sendData(struct.pack(">f", num))
-        
-        print("Enviou")
-    except Exception as erro:
-        print("ops! :-\\")
-        print(erro)
-        com1.disable()
-        
+        print("Byte de sacrifício enviado.")
 
-    #so roda o main quando for executado do terminal ... se for chamado dentro de outro modulo nao roda
+        # 2. ENVIAR A QUANTIDADE DE NÚMEROS
+        nAleatorio = random.randint(5, 15)
+        print(f"Serão enviados {nAleatorio} números.")
+        # Envia a quantidade como um único byte
+        quantidade_bytes = nAleatorio.to_bytes(1, byteorder="big")
+        com1.sendData(quantidade_bytes)
+        time.sleep(0.1)
+
+        # 3. ENVIAR OS NÚMEROS
+        numeros_enviados = []
+        for i in range(nAleatorio):
+            numero = listanum[i]
+            numeros_enviados.append(numero)
+            
+            print(f"Enviando número [{i+1}/{nAleatorio}]: {numero}")
+            # Empacota o float em 4 bytes (padrão IEEE 754) e envia
+            com1.sendData(struct.pack(">f", numero))
+            time.sleep(0.05) # Delay entre envios para não sobrecarregar o buffer
+        
+        print("\nTodos os números foram enviados. Aguardando a soma do servidor...")
+
+        rx, nRx = com1.getData(4)
+        soma_servidor = struct.unpack(">f", rx)[0]
+        print(soma_servidor)
+
+    except Exception as erro:
+        print("Ops! Ocorreu um erro no cliente:-\\")
+        print(erro)
+    finally:
+        # Garante que a comunicação será encerrada mesmo que ocorra um erro
+        print("Encerrando a comunicação do cliente.")
+        com1.disable()
+
 if __name__ == "__main__":
     main()
