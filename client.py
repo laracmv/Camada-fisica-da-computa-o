@@ -21,7 +21,7 @@ listanum = [
 
 def main():
     time_out = False
-    soma_correta = sum(listanum)
+    
     
     try:
         print("Iniciou o main do CLIENTE")
@@ -59,11 +59,13 @@ def main():
             time.sleep(0.05) # Delay entre envios para não sobrecarregar o buffer
         
         print("\nTodos os números foram enviados. Aguardando a soma do servidor...")
-
+        soma_correta = sum(numeros_enviados)
 
         start_time = time.perf_counter()
         time_out = False
         timeout = 5  # segundos
+
+
 
         while not time_out:
             elapsed = time.perf_counter() - start_time
@@ -81,7 +83,22 @@ def main():
                 break
 
             time.sleep(0.05)  # espera pequena p/ não travar CPU
-    
+
+        soma_correta = sum(listanum)
+        soma_correta_round = round(soma_correta,3)
+        soma_servidor_round = round(soma_servidor, 3)
+
+        print(f"Soma correta: {soma_correta}") 
+        print(f"Soma servidor: {soma_servidor}")  
+        print(f"Soma correta arrendondada: {soma_correta_round}")  
+        print(f"Soma servidor arrendondada: {soma_servidor_round }")  
+        
+
+        if (soma_correta_round - soma_servidor_round) == 0:
+            print("Deu erro na soma do servidor")
+        else:
+            print("soma ok")
+        
 
     except Exception as erro:
         print("Ops! Ocorreu um erro no cliente:-\\")
