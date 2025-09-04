@@ -48,30 +48,30 @@ def main():
         rxBuffer, nRx = com1.getData(4)
         string = rxBuffer.decode('utf-8')
         print(string)
-        rxBuffer, nRx = com1.getData(4)
-        print(rxBuffer)
-        len_num = struct.unpack('<f', rxBuffer)[0]
-        len_num = int(len_num)
-        print("Quantidade de elementos a serem recebidos:", len_num)
-        print("Byte de sacrificio recebido")
+        # rxBuffer, nRx = com1.getData(4)
+        # print(rxBuffer)
+        # len_num = struct.unpack('<f', rxBuffer)[0]
+        # len_num = int(len_num)
+        # print("Quantidade de elementos a serem recebidos:", len_num)
+        # print("Byte de sacrificio recebido")
         
-        total = 0
+        # total = 0
 
-        for i in range(len_num):
-            rxBuffer, nRx = com1.getData(4)
-            if nRx > 0:
-                float_value = struct.unpack('<f', rxBuffer)[0]
-                print(float_value)
-                total += float_value
-                ultimo_recebimento = time.time()
-            time.sleep(0.01)
+        # for i in range(len_num):
+        #     rxBuffer, nRx = com1.getData(4)
+        #     if nRx > 0:
+        #         float_value = struct.unpack('<f', rxBuffer)[0]
+        #         print(float_value)
+        #         total += float_value
+        #         ultimo_recebimento = time.time()
+        #     time.sleep(0.01)
         
-        print("Encerrando recebimento")
+        # print("Encerrando recebimento")
 
-        # Converter total para bytes e enviar
-        total_bytes = struct.pack('<f', total)
-        com1.sendData(total_bytes)
-        print("Total enviado:", total)
+        # # Converter total para bytes e enviar
+        # total_bytes = struct.pack('<f', total)
+        # com1.sendData(total_bytes)
+        # print("Total enviado:", total)
 
         print("-------------------------")
         print("Comunicação encerrada")
