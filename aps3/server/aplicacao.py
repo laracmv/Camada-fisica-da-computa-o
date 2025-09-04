@@ -49,10 +49,26 @@ def main():
         len_frase = struct.unpack('<f', rxBuffer)[0]
         len_frase = int(len_frase)
         time.sleep(0.1)
+        
         print("Recebendo handshake")
         rxBuffer, nRx = com1.getData(len_frase)
         string = rxBuffer.decode('utf-8')
         print(string)
+        print("Frase recebida")
+        time.sleep(.1)
+        
+        n_arquivos = 4
+        com1.sendData(struct.pack('<f', n_arquivos))
+        time.sleep(.1)
+        print("Enviando nomes de arquivos")
+        
+        for i in range(4):
+            nome_arquivo = f"Fodase{i+1}.txt"
+            nome_arquivo_bytes = nome_arquivo.encode(encoding='utf-8')
+            com1.sendData(nome_arquivo_bytes)
+            time.sleep(.1)
+        
+        
         
         # print("Quantidade de elementos a serem recebidos:", len_num)
         # print("Byte de sacrificio recebido")
