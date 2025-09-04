@@ -62,11 +62,18 @@ def main():
         while time.time() - hora_envio < 3:
             nRx = com1.rx.getBufferLen()
             if nRx:
-                rx_buffer = com1.getData(1)[0]
+                rx_buffer = com1.getData(4)[0]
                 break
         
         if not rx_buffer:
             print("Demorou muito para receber arquivos")
+        else:
+            rx_int = int(unpack('<f', rx_buffer)[0])
+            print(rx_int)
+            print("Arquivos disponíveis")
+            for i in range(rx_int):
+                arquivo = com1.getData(11)[0].decode(encoding='utf-8')
+                print(f"Arquivo: {arquivo}")
 
         com1.disable()
 
