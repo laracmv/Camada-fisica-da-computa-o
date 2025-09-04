@@ -13,6 +13,7 @@
 from enlace import *
 import time
 import numpy as np
+import struct
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -38,70 +39,40 @@ def main():
         #Se chegamos até aqui, a comunicação foi aberta com sucesso. Faça um print para informar.
         print("Abriu a comunicação")
         
-           
-                  
-        #aqui você deverá gerar os dados a serem transmitidos. 
-        #seus dados a serem transmitidos são um array bytes a serem transmitidos. Gere esta lista com o 
-        #nome de txBuffer. Esla sempre irá armazenar os dados a serem enviados.
+        print("esperando 1 byte de sacrifício")
+        rxBuffer, nRx = com1.getData(1)
+        com1.rx.clearBuffer()
+        time.sleep(.1)
         
-        #txBuffer = imagem em bytes!
-        imagem1 = './Handout/Image.png'
-        imagem2 = './Handout/Image_copia.png'
+        print("Recebendo handshake")
+        rxBuffer, nRx = com1.getData(4)
+        string = rxBuffer.decode('utf-8')
+        print(string)
+        rxBuffer, nRx = com1.getData(4)
+        print(rxBuffer)
+        len_num = struct.unpack('<f', rxBuffer)[0]
+        len_num = int(len_num)
+        print("Quantidade de elementos a serem recebidos:", len_num)
+        print("Byte de sacrificio recebido")
         
-        print("Carregando imagem para transmissão: ")
-        print(f" - {imagem1}")
-        print("---------------------------")
+        total = 0
+
+        for i in range(len_num):
+            rxBuffer, nRx = com1.getData(4)
+            if nRx > 0:
+                float_value = struct.unpack('<f', rxBuffer)[0]
+                print(float_value)
+                total += float_value
+                ultimo_recebimento = time.time()
+            time.sleep(0.01)
         
-        txBuffer = open(imagem1, 'rb').read()  #isso é um array de bytes. apenas um exemplo para teste. Deverá ser substutuido pelo 
-        #array correspondente à imagem
-       
-        print("meu array de bytes tem tamanho {}" .format(len(txBuffer)))
-        #faça aqui uma conferência do tamanho do seu txBuffer, ou seja, quantos bytes serão enviados.
-       
-            
-        #finalmente vamos transmitir os todos. Para isso usamos a funçao sendData que é um método da camada enlace.
-        #faça um print para avisar que a transmissão vai começar.
-        #tente entender como o método send funciona!
-        #Cuidado! Apenas trasmita arrays de bytes!
-               
-        
-        com1.sendData(np.asarray(txBuffer))  #as array apenas como boa pratica para casos de ter uma outra forma de dados
-          
-        # A camada enlace possui uma camada inferior, TX possui um método para conhecermos o status da transmissão
-        # O método não deve estar fincionando quando usado como abaixo. deve estar retornando zero. Tente entender como esse método funciona e faça-o funcionar.
-        
-        while com1.tx.getIsBussy():
-            pass
-        
-        txSize = com1.tx.getStatus()
-        print('enviou = {}' .format(txSize))
-        
-        #Agora vamos iniciar a recepção dos dados. Se algo chegou ao RX, deve estar automaticamente guardado
-        #Observe o que faz a rotina dentro do thread RX
-        #print um aviso de que a recepção vai começar.
-        
-        #Será que todos os bytes enviados estão realmente guardadas? Será que conseguimos verificar?
-        #Veja o que faz a funcao do enlaceRX  getBufferLen
-      
-        #acesso aos bytes recebidos
-        txLen = len(txBuffer)
-        rxBuffer, nRx = com1.getData(txLen)
-        print("recebeu {} bytes" .format(len(rxBuffer)))
-        
-        
-        #apenas para teste dos 4 bytes exemplo. NO caso da imagem devera ser retirado para nao poluir...
-        for i in range(len(rxBuffer)):
-            print("recebeu {}" .format(rxBuffer[i]))
-        
-        print("Salvando dados no arquivo :")
-        print(f" - {imagem2}")
-        
-        f = open(imagem2, 'wb')
-        f.write(rxBuffer)
-        
-        f.close()
-    
-        # Encerra comunicação
+        print("Encerrando recebimento")
+
+        # Converter total para bytes e enviar
+        total_bytes = struct.pack('<f', total)
+        com1.sendData(total_bytes)
+        print("Total enviado:", total)
+
         print("-------------------------")
         print("Comunicação encerrada")
         print("-------------------------")
