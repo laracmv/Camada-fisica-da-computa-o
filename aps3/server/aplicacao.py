@@ -44,14 +44,16 @@ def main():
         com1.rx.clearBuffer()
         time.sleep(.1)
         
-        print("Recebendo handshake")
         rxBuffer, nRx = com1.getData(4)
+        print(rxBuffer)
+        len_frase = struct.unpack('<f', rxBuffer)[0]
+        len_frase = int(len_frase)
+        time.sleep(0.1)
+        print("Recebendo handshake")
+        rxBuffer, nRx = com1.getData(len_frase)
         string = rxBuffer.decode('utf-8')
         print(string)
-        # rxBuffer, nRx = com1.getData(4)
-        # print(rxBuffer)
-        # len_num = struct.unpack('<f', rxBuffer)[0]
-        # len_num = int(len_num)
+        
         # print("Quantidade de elementos a serem recebidos:", len_num)
         # print("Byte de sacrificio recebido")
         
