@@ -2,3 +2,38 @@ ENTRE 113 E 116 BYTES
 HEADER: 10 - 13
 BODY: 0 - 100
 EOP: 3 - 4
+
+--------------- HEADER ---------------------
+12 BYTES
+
+H1 - COMUNICACAO OU TRANSMISSAO
+
+SE FOR COMUNICACAO:
+        H2: TAMANHO DA MENSAGEM
+        H3 - 11: MENSAGEM
+        H12: STATUS DA MENSAGEM
+
+SE FOR TRANSMISSAO:
+        H2 - TAMANHO DA MENSAGEM
+        H3 - NUMERO DE PACOTES
+        H4 - ÍNDICE
+        H5 - MENSAGEM DE ERRO
+        
+        H6 E 7 - TAMANHO DO PAYLOAD
+        H8 A 12 - LIVRES 
+
+--------------- PAYLOAD ---------------------
+100 BYTES
+POR PADRÃO, TUDO VALE 0
+A MENOS Q SEJA TRANSMISSAO
+
+--------------- EOF ---------------------
+3 BYTES
+
+TUDO 69
+POR QUE MATURIDADE É FODA
+
+--------------- MENSAGENS DE ERRO ---------------------
+0 - DEU BOM
+1 - ERRO DE TRANSMISSAO
+2 - CORRUPCAO DE DADOS

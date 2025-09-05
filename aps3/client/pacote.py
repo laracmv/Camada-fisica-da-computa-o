@@ -1,4 +1,6 @@
 from enlace import *
 
 class Package:
-    pass
+    def __init__(self, pacote):
+
+        pass
