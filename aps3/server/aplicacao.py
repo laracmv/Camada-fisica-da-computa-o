@@ -13,6 +13,7 @@
 from enlace import *
 import time
 import numpy as np
+from pacote import Package
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -71,6 +72,14 @@ def main():
             time.sleep(.1)
         
         print("Nomes enviados")
+         
+        msg = f"Gostaria de qual arquivo? "
+        len_msg = len(msg)
+        com1.sendData(len_msg.to_bytes(4))
+        time.sleep(.1)
+        com1.sendData(msg.encode('utf-8'))
+        time.sleep(.1)
+        
         print("Esperando resposta do cliente")
         
          # Esperar resposta do cliente
@@ -81,17 +90,17 @@ def main():
         resposta = com1.getData(len_resposta)
         resposta = resposta[0].decode('utf-8')
         
-        while resposta != "nao":
+        while resposta != "nao" and resposta != "":
             if resposta in nome_arquivos:
                 print(f"Cliente escolheu o arquivo: {resposta}")
-                arquivos_desejados.append("Camada-fisica-da-computa-o/aps3/Arquivos/" + resposta)
-                msg = f"arquivo {resposta} disponivel, quer adicionar mais algum?"
+                arquivos_desejados.append("C:\\Users\\lorag\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\VSC\\Camadas\\Camada-fisica-da-computa-o\\aps3\\Arquivos\\" + resposta)
+                msg = f"arquivo {resposta} disponivel, quer adicionar mais algum? "
                 len_msg = len(msg)
                 com1.sendData(len_msg.to_bytes(4))
                 time.sleep(.1)
                 com1.sendData(msg.encode('utf-8'))
             else:
-                msg = f"arquivo {resposta} nao disponivel, quer adicionar mais algum?"
+                msg = f"arquivo {resposta} nao disponivel, quer adicionar mais algum? "
                 len_msg = len(msg)
                 com1.sendData(len_msg.to_bytes(4))
                 time.sleep(.1)
@@ -104,17 +113,22 @@ def main():
             resposta = com1.getData(len_resposta)
             resposta = resposta[0].decode('utf-8')
             print("Resposta do cliente:", resposta)
-            time.sleep(.1)
-           
-        print("Enviando arquivos desejados") 
-        for arquivo in arquivos_desejados:
-            print(f"Enviando arquivo: {arquivo}")
-            with open(arquivo, 'rb') as f:
-                conteudo = f.read()
-            
+            time.sleep(.1)     
         
         print("Arquivos desejados:", arquivos_desejados)
         
+        for arquivo in arquivos_desejados:
+            print(f"Enviando arquivo: {arquivo}")
+            pacotes = Package(com1, arquivo).cria_pacote()
+            print("Arquivo lido")
+            for pacote in pacotes:
+                print(pacote)
+                com1.sendData(pacote)
+                print("Enviando pacote...")
+                time.sleep(0.1)
+            time.sleep(0.1)
+            print("Arquivo enviado")
+
         # print("Quantidade de elementos a serem recebidos:", len_num)
         # print("Byte de sacrificio recebido")
         
