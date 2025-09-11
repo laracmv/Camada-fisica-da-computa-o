@@ -59,3 +59,13 @@ class Package:
                 self.payload = Package.image_bytes[:100]
                 Package.image_bytes = Package.image_bytes[100:]
         pass
+    
+    def cria_pacote(self):
+        n_payloads = self.header[3]
+        lista_pacotes = []  
+        for i in range(n_payloads):
+            self.cria_payload()
+            pacote = self.header + self.payload + self.eop
+            lista_pacotes.append(pacote)
+            Package.contador_indice += 1
+        return lista_pacotes
