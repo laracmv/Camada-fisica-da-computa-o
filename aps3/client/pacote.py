@@ -23,7 +23,7 @@ class Package:
         h2 = self.file_size # tamanho da mensagem
         h3 = ceil(self.file_size / 100) # numero de pacotes
 
-        h4 = Package.contador_indice #indice que esta sendo iterado
+        h4 = Package.contador_indice #indice que esta sendo iterado'
 
         h5 = 0
         if self.file_size > 255:
@@ -35,6 +35,6 @@ class Package:
         if h7 < 0:
             h7 = 0
         
-        _bytes = [1, h2, h3, h4, h5, h6, h7]
+        _bytes = [1, h2, h3, h4, h5, h6, h7, 0,0,0,0,0]
         
         pass
