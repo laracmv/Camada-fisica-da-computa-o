@@ -19,3 +19,11 @@ def manda_arquivo(enlace: enlace, content):
 def imagem_para_bytes(file_path: str):
     with open(file_path) as f:
         return bytearray(f.read(), encoding='utf-8')
+
+def decode_lista(lista_bytes):
+    l = []
+    for byte in lista_bytes:
+        num = int.from_bytes(byte)
+        l.append(num)
+    
+    return tuple(l)
