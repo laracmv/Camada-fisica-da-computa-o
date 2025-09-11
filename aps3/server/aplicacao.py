@@ -13,7 +13,6 @@
 from enlace import *
 import time
 import numpy as np
-import struct
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -33,6 +32,8 @@ def main():
         #para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
         
+        nome_arquivos = []
+        arquivos_desejados = []
     
         # Ativa comunicacao. Inicia os threads e a comunicação seiral 
         com1.enable()
@@ -43,11 +44,11 @@ def main():
         rxBuffer, nRx = com1.getData(1)
         com1.rx.clearBuffer()
         time.sleep(.1)
+        print("1 byte recebido")
         
         rxBuffer, nRx = com1.getData(4)
         print(rxBuffer)
-        len_frase = struct.unpack('<f', rxBuffer)[0]
-        len_frase = int(len_frase)
+        len_frase = int.from_bytes(rxBuffer)
         time.sleep(0.1)
         
         print("Recebendo handshake")
@@ -58,17 +59,61 @@ def main():
         time.sleep(.1)
         
         n_arquivos = 4
-        com1.sendData(struct.pack('<f', n_arquivos))
+        com1.sendData(n_arquivos.to_bytes(4))
         time.sleep(.1)
         print("Enviando nomes de arquivos")
         
         for i in range(4):
             nome_arquivo = f"Fodase{i+1}.txt"
+            nome_arquivos.append(nome_arquivo)
             nome_arquivo_bytes = nome_arquivo.encode(encoding='utf-8')
             com1.sendData(nome_arquivo_bytes)
             time.sleep(.1)
         
+        print("Nomes enviados")
+        print("Esperando resposta do cliente")
         
+         # Esperar resposta do cliente
+        len_resposta = com1.getData(4)[0]
+        len_resposta = int.from_bytes(len_resposta)
+        time.sleep(.1)
+        
+        resposta = com1.getData(len_resposta)
+        resposta = resposta[0].decode('utf-8')
+        
+        while resposta != "nao":
+            if resposta in nome_arquivos:
+                print(f"Cliente escolheu o arquivo: {resposta}")
+                arquivos_desejados.append("Camada-fisica-da-computa-o/aps3/Arquivos/" + resposta)
+                msg = f"arquivo {resposta} disponivel, quer adicionar mais algum?"
+                len_msg = len(msg)
+                com1.sendData(len_msg.to_bytes(4))
+                time.sleep(.1)
+                com1.sendData(msg.encode('utf-8'))
+            else:
+                msg = f"arquivo {resposta} nao disponivel, quer adicionar mais algum?"
+                len_msg = len(msg)
+                com1.sendData(len_msg.to_bytes(4))
+                time.sleep(.1)
+                com1.sendData(msg.encode('utf-8'))
+            time.sleep(.1)
+            
+            len_resposta = com1.getData(4)[0]
+            len_resposta = int.from_bytes(len_resposta)
+            time.sleep(.1)
+            resposta = com1.getData(len_resposta)
+            resposta = resposta[0].decode('utf-8')
+            print("Resposta do cliente:", resposta)
+            time.sleep(.1)
+           
+        print("Enviando arquivos desejados") 
+        for arquivo in arquivos_desejados:
+            print(f"Enviando arquivo: {arquivo}")
+            with open(arquivo, 'rb') as f:
+                conteudo = f.read()
+            
+        
+        print("Arquivos desejados:", arquivos_desejados)
         
         # print("Quantidade de elementos a serem recebidos:", len_num)
         # print("Byte de sacrificio recebido")
