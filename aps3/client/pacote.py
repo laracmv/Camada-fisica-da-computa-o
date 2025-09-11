@@ -1,7 +1,6 @@
 import os
 from enlace import *
 from math import ceil
-from utils import imagem_para_bytes
 
 
 class Package:
@@ -15,9 +14,13 @@ class Package:
         Package.contador_indice +=1 #somado toda vez que a classe for criada.
         Package.image_bytes = self.image_to_bytes(file_path)
         self.payload = None
-        self.eop = bytearray((69, 69, 69))
-        self.file_size = len(self.image_bytes)
         self.header = self.cria_header()
+        if Package.contador_indice != self.header[2]:
+            self.eop = bytearray((0, 0, 0))
+        else:
+            self.eop = bytearray((69, 69, 69))
+
+        self.file_size = len(self.image_bytes)
         pass
     
     def cria_header(self):
