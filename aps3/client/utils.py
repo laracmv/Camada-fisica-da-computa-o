@@ -16,8 +16,6 @@ def manda_arquivo(enlace: enlace, content):
     time.sleep(.1)
     return
 
-def separa_mensagem(enlace: enlace, file_content: str):
-    byte_content = bytearray(file_content)
-    
-    payloads = []
-    num_payloads = ceil(byte_content / 100)
+def imagem_para_bytes(file_path: str):
+    with open(file_path) as f:
+        return bytearray(f.read(), encoding='utf-8')

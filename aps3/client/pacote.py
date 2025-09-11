@@ -1,21 +1,22 @@
 import os
 from enlace import *
 from math import ceil
+from utils import imagem_para_bytes
 
 
 class Package:
     contador_indice = 0 
+    image_bytes = 0
 
     def __init__(
         self, com1: enlace,
-        mensagem=''
+        file_path: str
         ):
         Package.contador_indice +=1 #somado toda vez que a classe for criada.
-        self.msg = mensagem
-        self.payload = []
+        Package.image_bytes = self.image_to_bytes(file_path)
+        self.payload = None
         self.eop = bytearray((69, 69, 69))
-        self.file_size = 0
-        self.content = bytes(0)
+        self.file_size = len(self.image_bytes)
         self.header = self.cria_header()
         pass
     
@@ -37,4 +38,21 @@ class Package:
         
         _bytes = [1, h2, h3, h4, h5, h6, h7, 0,0,0,0,0]
         
+        pass
+    
+    def image_to_bytes(self, path):
+        with open(path) as img:
+            content = bytearray(img.read(), encoding='utf-8')
+        return content
+
+    def cria_payload(self):
+        tamanho = self.header[5] + self.header[6]
+        
+        if self.header[3] == 4:
+            self.payload = Package.image_bytes[:30]
+            self.payload[30:100] = bytes(0)
+        else:
+            if tamanho > 100:
+                self.payload = Package.image_bytes[:100]
+                Package.image_bytes = Package.image_bytes[100:]
         pass
