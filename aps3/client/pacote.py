@@ -62,10 +62,10 @@ class Package:
     
     def cria_pacote(self):
         n_payloads = self.header[3]
-        lista_pacotes = []  
+        pacote = bytearray()
         for i in range(n_payloads):
             self.cria_payload()
-            pacote = self.header + self.payload + self.eop
-            lista_pacotes.append(pacote)
+            parte = self.header + self.payload + self.eop
+            pacote.extend(parte)
             Package.contador_indice += 1
-        return lista_pacotes
+        return pacote
