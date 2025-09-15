@@ -31,7 +31,7 @@ def main():
         # declaramos um objeto do tipo enlace com o nome "com". Essa é a camada inferior à aplicação. Observe que um parametro
         # para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
-        end_imagens = 'aps3/client/img_recebidas/arquivo{num}.txt'
+        end_imagens = 'aps3/client/img_recebidas/arquivo{num}.png'
         # PACKAGE_SIZE = 115
 
         # Ativa comunicacao. Inicia os threads e a comunicação seiral
@@ -71,14 +71,14 @@ def main():
             print("Arquivos disponíveis")
 
             for i in range(rx_int):
-                arq = com1.getData(11)[0]
+                arq = com1.getData(8)[0]
                 print(arq.decode())
 
             while True:
                 time.sleep(.1)
-                len_msg = int.from_bytes(com1.getData(4)[0])
+                tam_msg = int.from_bytes(com1.getData(4)[0])
                 time.sleep(.2)
-                resp = com1.getData(len_msg)[0]
+                resp = com1.getData(tam_msg)[0]
                 time.sleep(.3)
                 print(resp.decode())
                 arq_escolhido = input("> ")
@@ -108,14 +108,12 @@ def main():
 
                 eop = decode_lista(resposta[-3:])
                 
-
                 if eop == (69, 69, 69):
-                    i = 1
-                    with open(end_imagens.format(num=i), 'wb') as f:
+                    with open(end_imagens.format(num=j), 'wb') as f:
                         f.write(content.rstrip())
 
                         print(
-                            f"Arquivo {i} salvo em {end_imagens.format(num=i)}\n"
+                            f"Arquivo {j} salvo em {end_imagens.format(num=j)}\n"
                         )
 
         print("Acabou")

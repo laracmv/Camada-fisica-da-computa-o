@@ -52,13 +52,12 @@ class Package:
     def cria_payload(self):
         tamanho = self.header[5] + self.header[6]
 
-        if self.header[3] == 4:
-            self.payload = Package.image_bytes[:30]
-            self.payload[30:100] = bytes(0)
+        if tamanho >= 100:
+            self.payload = Package.image_bytes[:100]
+            Package.image_bytes = Package.image_bytes[100:]
         else:
-            if tamanho > 100:
-                self.payload = Package.image_bytes[:100]
-                Package.image_bytes = Package.image_bytes[100:]
+            self.payload = Package.image_bytes[:]
+            Package.image_bytes = []
         pass
 
     def cria_pacote(self):
