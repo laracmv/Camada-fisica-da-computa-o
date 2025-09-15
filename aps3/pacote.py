@@ -8,7 +8,7 @@ class Package:
     image_bytes = 0
 
     def __init__(
-        self, com1: enlace,
+        self,
         file_path: str
     ):
         # somado toda vez que a classe for criada.

@@ -96,17 +96,43 @@ def main():
                     break
                 else:
                     arquivos += 1
+            
+            content = bytearray()
 
             for j in range(arquivos):
-                content = bytearray()
                 resposta: bytearray = com1.getData(115)[0]
                 time.sleep(.3)
-                content.extend(resposta[12:112])
-
-                print(resposta)
-                print('-'*50)
+                print(f"Resposta: {resposta}")
+                print('*'*50)
+                header = resposta[2]
+                indice = resposta[3]
+                # while indice <= header:
+                    # content.extend(resposta[12:112])
+                    
+                    # pacote = com1.getData(115)[0]
+                    # time.sleep(.2)
+                    # indice = pacote[3]
+                    # print(f"Novo pacote: {pacote}")
+                    # print(f'Indice do pacote: {pacote[3]}')
+                    # content.extend(resposta[12:112])
+                    
+                    # pacote = com1.getData(115)[0]
+                    # time.sleep(.2)
+                    # indice = pacote[3]
+                    # print(f"Novo pacote: {pacote}")
+                    # print(f'Indice do pacote: {pacote[3]}')
 
                 eop = decode_lista(resposta[-3:])
+                while eop != (69, 69, 69):
+                    content.extend(resposta[12:112])
+                    
+                    resposta = com1.getData(115)[0]
+                    
+                    time.sleep(.2)
+                    # indice = pacote[3]
+                    print(f"Novo pacote: {resposta}")
+                    print(f'Indice do pacote: {resposta[3]}')
+                    print(eop)
                 
                 if eop == (69, 69, 69):
                     with open(end_imagens.format(num=j), 'wb') as f:
@@ -115,6 +141,7 @@ def main():
                         print(
                             f"Arquivo {j} salvo em {end_imagens.format(num=j)}\n"
                         )
+                    content = bytearray()
 
         print("Acabou")
 
