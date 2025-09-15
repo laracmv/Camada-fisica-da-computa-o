@@ -23,7 +23,7 @@ def imagem_para_bytes(file_path: str):
 def decode_lista(lista_bytes):
     l = []
     for byte in lista_bytes:
-        num = int.from_bytes(byte)
-        l.append(num)
+        print(f"Byte: ", byte)
+        l.append(byte)
     
     return tuple(l)

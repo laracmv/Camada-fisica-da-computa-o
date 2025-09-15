@@ -31,8 +31,8 @@ def main():
         # declaramos um objeto do tipo enlace com o nome "com". Essa é a camada inferior à aplicação. Observe que um parametro
         # para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
-        end_imagens = 'aps3/client/img_recebidas/arquivo{num}.png'
-        PACKAGE_SIZE = 115
+        end_imagens = 'aps3/client/img_recebidas/arquivo{num}.txt'
+        # PACKAGE_SIZE = 115
 
         # Ativa comunicacao. Inicia os threads e a comunicação seiral
         com1.enable()
@@ -40,7 +40,6 @@ def main():
         # ---------------- BYTE DE SACRIFÍCIO ----------------
         time.sleep(.2)
         com1.sendData(b'00')
-        print('mandou byte')
         time.sleep(1)
         # ---------------------------------------------------
 
@@ -48,7 +47,6 @@ def main():
 
         bytes_msg = msg.encode(encoding='utf-8')
         len_msg = len(msg).to_bytes(4)
-        print(len(bytes_msg))
 
         time.sleep(.3)
         com1.sendData(len_msg)
@@ -57,6 +55,7 @@ def main():
         time.sleep(.1)
         hora_envio = time.time()
         rx_buffer = None
+        arquivos = 0
 
         print("Esperando")
         while time.time() - hora_envio < 3:
@@ -69,7 +68,6 @@ def main():
             print("Demorou muito para receber arquivos")
         else:
             rx_int = int.from_bytes(rx_buffer)
-            print(rx_int)
             print("Arquivos disponíveis")
 
             for i in range(rx_int):
@@ -77,36 +75,48 @@ def main():
                 print(arq.decode())
 
             while True:
-                arq_escolhido = input("Escolha um deles: ")
+                time.sleep(.1)
+                len_msg = int.from_bytes(com1.getData(4)[0])
+                time.sleep(.2)
+                resp = com1.getData(len_msg)[0]
+                time.sleep(.3)
+                print(resp.decode())
+                arq_escolhido = input("> ")
 
                 bytes_arq = arq_escolhido.encode()
                 len_arq = len(arq_escolhido).to_bytes(4)
+
                 time.sleep(.3)
                 com1.sendData(len_arq)
-                time.sleep(.1)
+                time.sleep(.2)
                 com1.sendData(bytes_arq)
-                time.sleep(.3)
-                print("mandou arquivo")
+                time.sleep(.1)
 
-                if arq_escolhido == 'nao':
+                if arq_escolhido in ('nao', ''):
                     break
+                else:
+                    arquivos += 1
 
-            while True:
+            for j in range(arquivos):
                 content = bytearray()
-                resposta: bytearray = com1.getData(PACKAGE_SIZE)[0]
+                resposta: bytearray = com1.getData(115)[0]
                 time.sleep(.3)
                 content.extend(resposta[12:112])
-                
+
+                print(resposta)
+                print('-'*50)
+
                 eop = decode_lista(resposta[-3:])
                 
+
                 if eop == (69, 69, 69):
                     i = 1
                     with open(end_imagens.format(num=i), 'wb') as f:
-                        f.write(content)
-                        print(f"Arquivo {i} salvo em {end_imagens.format(num=i)}")
-                    break
-                
-                
+                        f.write(content.rstrip())
+
+                        print(
+                            f"Arquivo {i} salvo em {end_imagens.format(num=i)}\n"
+                        )
 
         print("Acabou")
 
@@ -116,6 +126,7 @@ def main():
         print("ops! :-\\")
         print(erro)
         com1.disable()
+
 
     # so roda o main quando for executado do terminal ... se for chamado dentro de outro modulo nao roda
 if __name__ == "__main__":
