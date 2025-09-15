@@ -14,6 +14,7 @@ from enlace import *
 import time
 import numpy as np
 from pacote import Package
+import os
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -33,7 +34,6 @@ def main():
         #para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
         
-        nome_arquivos = []
         arquivos_desejados = []
     
         # Ativa comunicacao. Inicia os threads e a comunicação seiral 
@@ -64,10 +64,12 @@ def main():
         time.sleep(.1)
         print("Enviando nomes de arquivos")
         
-        for i in range(4):
-            nome_arquivo = f"Fodase{i+1}.txt"
-            nome_arquivos.append(nome_arquivo)
-            nome_arquivo_bytes = nome_arquivo.encode(encoding='utf-8')
+        caminho = "C:\\Users\\lorag\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\VSC\\Camadas\\Camada-fisica-da-computa-o\\aps3\\Arquivos\\"
+        nomes_arquivos = [f for f in os.listdir(caminho) if os.path.isfile(os.path.join(caminho, f))]
+        print(nomes_arquivos)
+
+        for nome in nomes_arquivos:
+            nome_arquivo_bytes = nome.encode(encoding='utf-8')
             com1.sendData(nome_arquivo_bytes)
             time.sleep(.1)
         
@@ -91,7 +93,7 @@ def main():
         resposta = resposta[0].decode('utf-8')
         
         while resposta != "nao" and resposta != "":
-            if resposta in nome_arquivos:
+            if resposta in nomes_arquivos:
                 print(f"Cliente escolheu o arquivo: {resposta}")
                 arquivos_desejados.append("C:\\Users\\lorag\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\VSC\\Camadas\\Camada-fisica-da-computa-o\\aps3\\Arquivos\\" + resposta)
                 msg = f"arquivo {resposta} disponivel, quer adicionar mais algum? "
@@ -124,7 +126,7 @@ def main():
             for pacote in pacotes:
                 print(pacote)
                 com1.sendData(pacote)
-                print("Enviando pacote...")
+                print(f"Enviando pacote de tamanho {len(pacote)}")
                 time.sleep(0.1)
             time.sleep(0.1)
             print("Arquivo enviado")
