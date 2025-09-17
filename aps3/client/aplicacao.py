@@ -31,7 +31,7 @@ def main():
         # declaramos um objeto do tipo enlace com o nome "com". Essa é a camada inferior à aplicação. Observe que um parametro
         # para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
-        end_imagens = 'aps3/client/img_recebidas/arquivo{num}.png'
+        end_imagens = '/home/rafaelvb/Desktop/Engenharia/Camada-fisica-da-computa-o/aps3/client/img_recebidas'
         # PACKAGE_SIZE = 115
 
         # Ativa comunicacao. Inicia os threads e a comunicação seiral
@@ -129,17 +129,18 @@ def main():
                     resposta = com1.getData(115)[0]
                     
                     time.sleep(.2)
-                    # indice = pacote[3]
+                    eop = decode_lista(resposta[-3:])
                     print(f"Novo pacote: {resposta}")
                     print(f'Indice do pacote: {resposta[3]}')
                     print(eop)
                 
                 if eop == (69, 69, 69):
-                    with open(end_imagens.format(num=j), 'wb') as f:
-                        f.write(content.rstrip())
+                    content.extend(resposta[12:112])
+                    with open(end_imagens+f'/arquivo{j+1}.png', 'wb') as f:
+                        f.write(content)
 
                         print(
-                            f"Arquivo {j} salvo em {end_imagens.format(num=j)}\n"
+                            f"Arquivo {j+1} salvo em {end_imagens+f'/arquivo{j+1}.png'}\n"
                         )
                     content = bytearray()
 
