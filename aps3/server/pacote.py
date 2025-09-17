@@ -7,64 +7,57 @@ class Package:
     contador_indice = 0
     image_bytes = bytearray()
 
-    def __init__(
-        self, com1: enlace,
-        file_path: str
-    ):
-        # somado toda vez que a classe for criada.
-        Package.contador_indice += 1
+    def __init__(self, file_path: str):
+        # Inicializa variáveis de classe para cada novo arquivo
         Package.image_bytes = self.image_to_bytes(file_path)
         self.file_size = len(Package.image_bytes)
         self.payload = bytearray()
-        self.header = self.cria_header()
-        if Package.contador_indice != self.header[2]:
-            self.eop = bytearray((0, 0, 0))
-        else:
-            self.eop = bytearray((69, 69, 69))
+        # O header e EOP serão criados por pacote, não no construtor
 
     def cria_header(self):
-        h2 = self.file_size  # tamanho da mensagem
-        h3 = ceil(self.file_size / 100)  # numero de pacotes
-
-        h4 = Package.contador_indice  # indice que esta sendo iterado'
-
+        h2 = self.file_size
+        h3 = ceil(self.file_size / 100)
+        h4 = Package.contador_indice
         h5 = 0
-        if self.file_size > 255:
-            h6 = 255
-        else:
-            h6 = self.file_size
-
-        h7 = self.file_size - 255
-        if h7 < 0:
-            h7 = 0
-
-        _bytes = [1, h2, h3, h4, h5, h6, h7, 0, 0, 0, 0, 0]
-        return _bytes
+        h6 = 255 if self.file_size > 255 else self.file_size
+        h7 = self.file_size - 255 if self.file_size > 255 else 0
+        header = [1, h2, h3, h4, h5, h6, h7, 0, 0, 0, 0, 0]
+        header_bytes = bytearray([b & 0xFF for b in header])
+        return header_bytes
 
     def image_to_bytes(self, path):
-        with open(path) as img:
-            content = bytearray(img.read(), encoding='utf-8')
+        with open(path, 'rb') as img:
+            content = bytearray(img.read())
         return content
 
-    def cria_payload(self):
-        tamanho = self.header[5] + self.header[6]
-
-        if self.header[3] == 4:
-            self.payload = Package.image_bytes[:30]
-            self.payload[30:100] = bytes(0)
-        else:
-            if tamanho > 100:
-                self.payload = Package.image_bytes[:100]
-                Package.image_bytes = Package.image_bytes[100:]
+    def cria_payloads(self):
+        total_bytes = Package.image_bytes
+        payloads = []
+        while len(total_bytes) > 0:
+            chunk = total_bytes[:100]
+            total_bytes = total_bytes[100:]
+            if len(chunk) < 100:
+                chunk += b' ' * (100 - len(chunk))
+            payloads.append(chunk)
+        # Garante que o último payload tenha 100 bytes, mesmo se o arquivo for múltiplo de 100
+        if payloads and len(payloads[-1]) < 100:
+            payloads[-1] += b' ' * (100 - len(payloads[-1]))
+        print(len(payloads))
+        return payloads
 
     def cria_pacote(self):
-        n_payloads = self.header[3]
+        payloads = self.cria_payloads()
         lista_pacotes = []
-        for i in range(n_payloads):
-            self.cria_payload()
-            header_bytes = bytearray(self.header)
-            pacote = header_bytes + self.payload + self.eop
-            lista_pacotes.append(pacote)
-            print(len(pacote))
+        Package.contador_indice = 0
+        for i, payload in enumerate(payloads):
             Package.contador_indice += 1
+            # EOP: último pacote recebe (69,69,69), demais (0,0,0)
+            if i == len(payloads) - 1:
+                eop = bytearray((69, 69, 69))
+            else:
+                eop = bytearray((0, 0, 0))
+            pacote = self.cria_header() + payload + eop
+            lista_pacotes.append(pacote)
+        Package.contador_indice = 0
+        Package.image_bytes = bytearray()
         return lista_pacotes

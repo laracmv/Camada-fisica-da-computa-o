@@ -77,6 +77,7 @@ def main():
          
         msg = f"Gostaria de qual arquivo? "
         len_msg = len(msg)
+        print(len_msg)
         com1.sendData(len_msg.to_bytes(4))
         time.sleep(.1)
         com1.sendData(msg.encode('utf-8'))
@@ -95,7 +96,7 @@ def main():
         while resposta != "nao" and resposta != "":
             if resposta in nomes_arquivos:
                 print(f"Cliente escolheu o arquivo: {resposta}")
-                arquivos_desejados.append("C:\\Users\\lorag\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\VSC\\Camadas\\Camada-fisica-da-computa-o\\aps3\\Arquivos\\" + resposta)
+                arquivos_desejados.append(caminho + resposta)
                 msg = f"arquivo {resposta} disponivel, quer adicionar mais algum? "
                 len_msg = len(msg)
                 com1.sendData(len_msg.to_bytes(4))
@@ -121,7 +122,7 @@ def main():
         
         for arquivo in arquivos_desejados:
             print(f"Enviando arquivo: {arquivo}")
-            pacotes = Package(com1, arquivo).cria_pacote()
+            pacotes = Package(arquivo).cria_pacote()
             print("Arquivo lido")
             for pacote in pacotes:
                 print(pacote)
