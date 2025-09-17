@@ -21,7 +21,12 @@ class Package:
         h5 = 0
         h6 = 255 if self.file_size > 255 else self.file_size
         h7 = self.file_size - 255 if self.file_size > 255 else 0
-        header = [1, h2, h3, h4, h5, h6, h7, 0, 0, 0, 0, 0]
+        h8 = self.file_size - 510 if self.file_size > 510 else 0
+        h9 = self.file_size - 765 if self.file_size > 765 else 0
+        h10 = self.file_size - 1020 if self.file_size > 1020 else 0
+        h11 = self.file_size - 1275 if self.file_size > 1275 else 0
+        h12 = self.file_size - 1530 if self.file_size > 1530 else 0
+        header = [1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12]
         header_bytes = bytearray([b & 0xFF for b in header])
         return header_bytes
 
