@@ -1,0 +1,5 @@
+CLIENT:
+        - Conseguir receber mais de um arquivo por vez
+
+SERVER:
+        - Fazer o código conseguir mandar imagens
