@@ -107,23 +107,6 @@ def main():
                 time.sleep(.3)
                 print(f"Resposta: {resposta}")
                 print('*'*50)
-                header = resposta[2]
-                indice = resposta[3]
-                # while indice <= header:
-                    # content.extend(resposta[12:112])
-                    
-                    # pacote = com1.getData(115)[0]
-                    # time.sleep(.2)
-                    # indice = pacote[3]
-                    # print(f"Novo pacote: {pacote}")
-                    # print(f'Indice do pacote: {pacote[3]}')
-                    # content.extend(resposta[12:112])
-                    
-                    # pacote = com1.getData(115)[0]
-                    # time.sleep(.2)
-                    # indice = pacote[3]
-                    # print(f"Novo pacote: {pacote}")
-                    # print(f'Indice do pacote: {pacote[3]}')
 
                 eop = decode_lista(resposta[-3:])
                 while eop != (69, 69, 69):
