@@ -1,7 +1,7 @@
 import os
 from enlace import *
 from math import ceil
-
+import crcmod
 
 class Package:
     contador_indice = 0
@@ -14,18 +14,17 @@ class Package:
         self.payload = bytearray()
         # O header e EOP serão criados por pacote, não no construtor
 
-    def cria_header(self):
+    def cria_header(self, checksum, status=0, msg = 0):
         h2 = self.file_size
         h3 = ceil(self.file_size / 100)
         h4 = Package.contador_indice
-        h5 = 0
-        h6 = 255 if self.file_size > 255 else self.file_size
-        h7 = self.file_size - 255 if self.file_size > 255 else 0
-        h8 = self.file_size - 510 if self.file_size > 510 else 0
-        h9 = self.file_size - 765 if self.file_size > 765 else 0
-        h10 = self.file_size - 1020 if self.file_size > 1020 else 0
-        h11 = self.file_size - 1275 if self.file_size > 1275 else 0
-        h12 = self.file_size - 1530 if self.file_size > 1530 else 0
+        h5 = status
+        h6 = msg
+        file_size_bytes = self.file_size.to_bytes(4, byteorder='big')
+        h7, h8, h9, h10 = file_size_bytes
+        valor_checksum = checksum & 0xFFFF  # Garante que o checksum caiba em 2 bytes
+        h11 = (valor_checksum >> 8) & 0xFF  # Byte
+        h12 = valor_checksum & 0xFF  # Byte
         header = [1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12]
         header_bytes = bytearray([b & 0xFF for b in header])
         return header_bytes
@@ -61,7 +60,10 @@ class Package:
                 eop = bytearray((69, 69, 69))
             else:
                 eop = bytearray((0, 0, 0))
-            pacote = self.cria_header() + payload + eop
+            crc = crcmod.mkCrcFun(0x11021)
+            checksum = crc(payload)
+            print(f"Checksum do payload {i+1}: {checksum}")
+            pacote = self.cria_header(checksum) + payload + eop
             lista_pacotes.append(pacote)
         Package.contador_indice = 0
         Package.image_bytes = bytearray()
