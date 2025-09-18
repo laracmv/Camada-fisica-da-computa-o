@@ -13,6 +13,7 @@
 from enlace import *
 import time
 from utils import decode_lista
+import crcmod
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -20,9 +21,9 @@ from utils import decode_lista
 # se estiver usando windows, o gerenciador de dispositivos informa a porta
 
 # use uma das 3 opcoes para atribuir à variável a porta usada
-serialName = "/dev/ttyUSB0"           # Ubuntu (variacao de)
+# serialName = "/dev/ttyUSB0"           # Ubuntu (variacao de)
 # serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-# serialName = "COM4"                  # Windows(variacao de)  detectar sua porta e substituir aqui
+serialName = "COM10"                  # Windows(variacao de)  detectar sua porta e substituir aqui
 
 
 def main():
@@ -31,7 +32,9 @@ def main():
         # declaramos um objeto do tipo enlace com o nome "com". Essa é a camada inferior à aplicação. Observe que um parametro
         # para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
-        end_imagens = '/home/rafaelvb/Desktop/Engenharia/Camada-fisica-da-computa-o/aps3/client/img_recebidas'
+        end_imagens = 'C:\\Users\\princ\\OneDrive - Insper - Institudo de Ensino e Pesquisa\Documentos\\INSPER\\4 periodo\\camadas\\Camada-fisica-da-computa-o\\aps4\\client\img_recebidas'
+        # end_imagens = '/home/rafaelvb/Desktop/Engenharia/Camada-fisica-da-computa-o/aps3/client/img_recebidas'
+
         # PACKAGE_SIZE = 115
 
         # Ativa comunicacao. Inicia os threads e a comunicação seiral
@@ -124,7 +127,17 @@ def main():
 
                 eop = decode_lista(resposta[-3:])
                 while eop != (69, 69, 69):
-                    content.extend(resposta[12:112])
+                    payload = resposta[12:112]
+                    crc = crcmod.mkCrcFun(0x11021)
+                    checksum = crc(payload)
+                    print('funçao checksum:', checksum)
+                    teste = int.from_bytes(resposta[10:12], byteorder='big')  # CORREÇÃO AQUI
+                    print('teste:', teste)
+                    if checksum == teste:
+                        print("Payload OK")
+                        content.extend(payload)
+                    else:
+                        print("Payload corrompido, descartando...")
                     
                     resposta = com1.getData(115)[0]
                     
