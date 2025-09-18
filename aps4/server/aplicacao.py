@@ -11,11 +11,12 @@
 
 
 from enlace import *
+from utils.pacote import Package
+from pathlib import Path
 import time
 import numpy as np
-from pacote import Package
 import os
-
+import sys
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
 #   python -m serial.tools.list_ports
@@ -25,6 +26,7 @@ import os
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
 serialName = "COM6"                  # Windows(variacao de)  detectar sua porta e substituir aqui
+sys.path.append(str(Path(__file__).parent.parent))
 
 def main():
     try:

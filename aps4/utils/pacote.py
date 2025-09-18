@@ -1,5 +1,5 @@
 import os
-from enlace import *
+from server.enlace import *
 from math import ceil
 import crcmod
 
@@ -7,14 +7,16 @@ class Package:
     contador_indice = 0
     image_bytes = bytearray()
 
-    def __init__(self, file_path: str):
+    def __init__(self, tipo: int, file_path: str):
         # Inicializa variáveis de classe para cada novo arquivo
         Package.image_bytes = self.image_to_bytes(file_path)
+        self.tipo = tipo
         self.file_size = len(Package.image_bytes)
         self.payload = bytearray()
         # O header e EOP serão criados por pacote, não no construtor
 
     def cria_header(self, checksum, status=0, msg = 0):
+        h1 = self.tipo
         h2 = self.file_size
         h3 = ceil(self.file_size / 100)
         h4 = Package.contador_indice
@@ -25,7 +27,7 @@ class Package:
         valor_checksum = checksum & 0xFFFF  # Garante que o checksum caiba em 2 bytes
         h11 = (valor_checksum >> 8) & 0xFF  # Byte
         h12 = valor_checksum & 0xFF  # Byte
-        header = [1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12]
+        header = [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12]
         header_bytes = bytearray([b & 0xFF for b in header])
         return header_bytes
 
