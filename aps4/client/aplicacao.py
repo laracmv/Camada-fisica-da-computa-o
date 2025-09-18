@@ -12,8 +12,9 @@
 
 from enlace import *
 import time
-from utils import decode_lista
 import crcmod
+from pacote import Package
+from cria_log import escreve_log
 
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
@@ -103,42 +104,42 @@ def main():
             content = bytearray()
 
             for j in range(arquivos):
-                resposta: bytearray = com1.getData(115)[0]
-                time.sleep(.3)
-                print(f"Resposta: {resposta}")
-                print('*'*50)
+                while True:
+                    resposta: bytearray = com1.getData(115)[0]
+                    print(f"Resposta: {resposta}")
+                    print('*'*50)
 
-                eop = decode_lista(resposta[-3:])
-                while eop != (69, 69, 69):
                     payload = resposta[12:112]
                     crc = crcmod.mkCrcFun(0x11021)
                     checksum = crc(payload)
-                    print('funçao checksum:', checksum)
-                    teste = int.from_bytes(resposta[10:12], byteorder='big')  # CORREÇÃO AQUI
-                    print('teste:', teste)
-                    if checksum == teste:
-                        print("Payload OK")
-                        content.extend(payload)
-                    else:
-                        print("Payload corrompido, descartando...")
-                    
-                    resposta = com1.getData(115)[0]
-                    
-                    time.sleep(.2)
-                    eop = decode_lista(resposta[-3:])
-                    print(f"Novo pacote: {resposta}")
-                    print(f'Indice do pacote: {resposta[3]}')
-                    print(eop)
-                
-                if eop == (69, 69, 69):
-                    content.extend(resposta[12:112])
-                    with open(end_imagens+f'/arquivo{j+1}.png', 'wb') as f:
-                        f.write(content)
+                    recebido = int.from_bytes(resposta[10:12], byteorder='big')
+                    print('Checksum calculado:', checksum)
+                    print('Checksum recebido:', recebido)
 
-                        print(
-                            f"Arquivo {j+1} salvo em {end_imagens+f'/arquivo{j+1}.png'}\n"
-                        )
-                    content = bytearray()
+                    if checksum == recebido:
+                        print("Payload OK, enviando ACK")
+                        content.extend(payload)
+                        pacote_ack = Package(0).cria_pacote()[0]
+                        com1.sendData(pacote_ack)
+                        time.sleep(.2)
+                        # Verifica EOP
+                        eop = tuple(resposta[-3:])
+                        if eop == (69, 69, 69):
+                            break
+                    else:
+                        print("Payload corrompido, enviando NACK")
+                        pacote_nack = Package(0, status=2).cria_pacote()[0]
+                        com1.sendData(pacote_nack)
+                        time.sleep(.2)
+                        # Tenta receber novamente o mesmo pacote
+
+                # Salva arquivo ao final do recebimento
+                with open(end_imagens+f'/arquivo{j+1}.png', 'wb') as f:
+                    f.write(content)
+                    print(
+                        f"Arquivo {j+1} salvo em {end_imagens+f'/arquivo{j+1}.png'}\n"
+                    )
+                content = bytearray()
 
         print("Acabou")
 
