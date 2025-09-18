@@ -140,6 +140,7 @@ def main():
                 if status != 2:
                     i += 1
                 print("Pacote enviado com sucesso")
+                escreve_log("envio", "dado", len(pacote), i, len(pacotes), None)
             time.sleep(0.1)
             print("Arquivo enviado")
 
