@@ -11,12 +11,13 @@
 
 
 from enlace import *
-from utils.pacote import Package
+from pacote import Package
 from pathlib import Path
 import time
 import numpy as np
 import os
 import sys
+from cria_log import escreve_log
 # voce deverá descomentar e configurar a porta com através da qual ira fazer comunicaçao
 #   para saber a sua porta, execute no terminal :
 #   python -m serial.tools.list_ports
@@ -123,13 +124,22 @@ def main():
         
         for arquivo in arquivos_desejados:
             print(f"Enviando arquivo: {arquivo}")
-            pacotes = Package(arquivo).cria_pacote()
+            pacotes = Package(1, arquivo).cria_pacote()
             print("Arquivo lido")
-            for pacote in pacotes:
+            i = 0
+            while i < len(pacotes):
+                pacote = pacotes[i]
                 print(pacote)
                 com1.sendData(pacote)
                 print(f"Enviando pacote de tamanho {len(pacote)}")
                 time.sleep(0.1)
+                print("Esperando confirmação do cliente")
+                rxBuffer, nrx = com1.getData(115)
+                print(rxBuffer[0])
+                status = rxBuffer[0]
+                if status != 2:
+                    i += 1
+                print("Pacote enviado com sucesso")
             time.sleep(0.1)
             print("Arquivo enviado")
 
