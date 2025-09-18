@@ -112,6 +112,7 @@ def main():
                     payload = resposta[12:112]
                     crc = crcmod.mkCrcFun(0x11021)
                     checksum = crc(payload)
+                    escreve_log("Recebimento", 'dado', len(resposta), resposta[3], resposta[2], checksum)
                     recebido = int.from_bytes(resposta[10:12], byteorder='big')
                     print('Checksum calculado:', checksum)
                     print('Checksum recebido:', recebido)
@@ -129,6 +130,7 @@ def main():
                     else:
                         print("Payload corrompido, enviando NACK")
                         pacote_nack = Package(0, status=2).cria_pacote()[0]
+                        escreve_log("Erro", 'dado', len(resposta), resposta[3], resposta[2], checksum)
                         com1.sendData(pacote_nack)
                         time.sleep(.2)
                         # Tenta receber novamente o mesmo pacote
