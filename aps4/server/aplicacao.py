@@ -26,7 +26,7 @@ from cria_log import escreve_log
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM6"                  # Windows(variacao de)  detectar sua porta e substituir aqui
+serialName = "COM3"                  # Windows(variacao de)  detectar sua porta e substituir aqui
 sys.path.append(str(Path(__file__).parent.parent))
 
 def main():
@@ -66,7 +66,8 @@ def main():
         time.sleep(.1)
         print("Enviando nomes de arquivos")
         
-        caminho = "C:\\Users\\lorag\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\VSC\\Camadas\\Camada-fisica-da-computa-o\\aps3\\Arquivos\\"
+        # caminho = "C:\\Users\\lorag\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\VSC\\Camadas\\Camada-fisica-da-computa-o\\aps3\\Arquivos\\"
+        caminho = "C:\\Users\\princ\\OneDrive - Insper - Institudo de Ensino e Pesquisa\\Documentos\\INSPER\\4 periodo\\camadas\\Camada-fisica-da-computa-o\\aps4\\Arquivos\\"
         nomes_arquivos = [f for f in os.listdir(caminho) if os.path.isfile(os.path.join(caminho, f))]
         print(nomes_arquivos)
 

@@ -20,9 +20,9 @@ from utils import decode_lista
 # se estiver usando windows, o gerenciador de dispositivos informa a porta
 
 # use uma das 3 opcoes para atribuir à variável a porta usada
-serialName = "/dev/ttyUSB0"           # Ubuntu (variacao de)
+# serialName = "/dev/ttyUSB0"           # Ubuntu (variacao de)
 # serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-# serialName = "COM4"                  # Windows(variacao de)  detectar sua porta e substituir aqui
+serialName = "COM10"                  # Windows(variacao de)  detectar sua porta e substituir aqui
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
         # declaramos um objeto do tipo enlace com o nome "com". Essa é a camada inferior à aplicação. Observe que um parametro
         # para declarar esse objeto é o nome da porta.
         com1 = enlace(serialName)
-        end_imagens = '/home/rafaelvb/Desktop/Engenharia/Camada-fisica-da-computa-o/aps3/client/img_recebidas'
+        end_imagens = 'C:\\Users\\princ\\OneDrive - Insper - Institudo de Ensino e Pesquisa\Documentos\\INSPER\\4 periodo\\camadas\\Camada-fisica-da-computa-o\\aps4\\client\img_recebidas'
         # PACKAGE_SIZE = 115
 
         # Ativa comunicacao. Inicia os threads e a comunicação seiral
