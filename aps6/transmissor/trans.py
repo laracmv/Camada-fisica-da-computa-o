@@ -9,7 +9,8 @@ frequencias_acordes = {
 }
 
 import numpy as np
-import sounddevice as sd    
+import sounddevice as sd  
+import matplotlib.pyplot as plt  
 
 sample_rate = 44100
 t = np.arange(stop=2,step=1/sample_rate)
@@ -47,8 +48,21 @@ while i:
         acorde = 'si_menor_5b' 
         i = False
 
-
+# sen = sen(2*pi*f*t)
 tom= np.sin(2*np.pi*frequencias_acordes[acorde][0]*t) + np.sin(2*np.pi*frequencias_acordes[acorde][1]*t) + np.sin(2*np.pi*frequencias_acordes[acorde][2]*t)
 
 sd.play(tom,sample_rate)
 sd.wait()
+
+transformada = np.fft.fft(tom)
+print(len(transformada))
+frequencias = np.fft.fftfreq(len(transformada),1/sample_rate)
+
+plt.plot(t,tom)
+plt.title("Gráfico frequencias somada x tempo")
+plt.show()
+
+plt.plot(frequencias, np.abs(transformada))
+plt.xlim(0,2000)
+plt.title("Gráfico transformada de fourier")
+plt.show()
