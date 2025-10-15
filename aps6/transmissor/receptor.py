@@ -32,10 +32,23 @@ transformada = np.fft.fft(audio.squeeze())
 frequencias = np.fft.fftfreq(len(transformada), 1/fs)
 
 pares = list(zip(frequencias, np.abs(transformada)))
-maior_menor = sorted(pares, key=lambda p: p[1], reverse=True)[:20]
+dic = {}
+for tupla in pares:
+    if tupla[0] > 0 and tupla[0] < 1500:  # Considera apenas frequências positivas
+        dic[tupla[0]] = tupla[1]
+if dic:
+    # Ordena pelas chaves (frequências) em ordem decrescente e pega as 5 maiores
+    top5_by_freq = sorted(dic.items(), key=lambda item: item[1], reverse=True)[:20]
+    top5_by_freq_dict = dict(top5_by_freq)
+    print("\nTop 5 maiores frequências e suas magnitudes (ordenadas por frequência decrescente):")
+    for freq, mag in top5_by_freq:
+        print(f"{freq:.2f} Hz: {mag:.6f}")
+    print('\nDicionário top5 por frequência:', top5_by_freq_dict)
+else:
+    print("Dicionário vazio: sem frequências positivas.")
+
 # Formata os valores para 3 casas decimais antes de criar o dicionário
-dicionario = {round(x, 3): round(y, 3) for x, y in maior_menor}
-print(dicionario)
+
 
 # Gráfico
 plt.plot(frequencias, np.abs(transformada))
