@@ -11,7 +11,7 @@ ordem = 5 #determina o decaimento do filtro, quanto menor, menos acentuado é o 
 t = np.arange(stop=2,step=1/sample_rate)
 
 tom = 0
-# sen = sen(2*pi*f*t)
+
 for f in frequencia:
     tom += np.sin(2*np.pi*f*t)
 
